@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "inlineSourceMap": false,
+        "outDir": "../output/dist",
+        "removeComments": true
+    },
+    "include": [
+        "../src/**/*.tsx?"
+    ],
+    "exclude": [
+        "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
+    ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "freeze-mutate",
+  "version": "1.0.0",
+  "description": "Utility library for immutable objects management",
+  "main": "output/src/index.js",
+  "typings": "output/src/index.d.ts",
+  "types": "output/index",
+  "scripts": {
+    "build": "tsc -p ./config/tsconfig.json --pretty",
+    "build:debug": "tsc -p ./config/tsconfig.debug.json --pretty",
+    "build:prod": "tsc -p ./config/tsconfig.release.json --pretty",
+    "test": "jest --coverage --no-cache --config ./config/jest.json",
+    "test:nocover": "jest --config ./config/jest.json",
+    "test:watch": "jest --watch --config ./config/jest.json",
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node --project ./config/tsconfig.debug.json -- ./src/index.ts",
+    "clean": "rimraf ./output",
+    "pretest": "npm run clean && npm run lint && npm run build",
+    "lint": "tslint --format stylish --config ./config/tslint.json --project ./config/tsconfig.json"
+  },
+  "author": "eram@weblegions.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.9.4",
+    "eslint": "^5.5.0",
+    "jest": "^23.5.0",
+    "nodemon": "^1.18.4",
+    "ts-jest": "^23.1.4",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-microsoft-contrib": "^5.2.1",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "npm": "^6.4.1"
+  }
+}
