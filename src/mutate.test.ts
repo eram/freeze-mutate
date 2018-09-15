@@ -6,6 +6,8 @@ it("jest is working", () => {
     expect(1).toBe(1);
 });
 
+interface IndexSig { [key: string]: any; }
+
 describe("primitive objects", () => {
 
     it("native object", () => {
@@ -87,8 +89,8 @@ describe("class object", () => {
         constructor(todo?: Partial<Todo>) {
             if (todo && Todo.ctor) {
                 Object.keys(todo).forEach(key => {
-                    const t = todo as any;
-                    const me = this as any;
+                    const t = todo as IndexSig;
+                    const me = this as IndexSig;
                     if (me[key] !== undefined) me[key] = t[key];
                 });
             }
@@ -296,7 +298,7 @@ describe("cyclic object", () => {
 
     it("should mutate 1", () => {
 
-        class MapN extends Map<number, IObj> { constructor(p?: any) { super(p); } }
+        class MapN extends Map<number, IObj> { constructor(p?: []) { super(p); } }
         interface IObj { m: MapN; }
 
         const a: IObj = { m: new MapN() };
@@ -338,17 +340,17 @@ describe("edge cases behaviour", () => {
 
     it("frozen object cannot be assigned", () => {
 
-        const dstRef = { byRef: freeze({ c: 3 }) };
+        const dstRef = { me: freeze({ c: 3 }) };
         const src = { c: 333 };
         mergeDeep(dstRef, src); // this should console-err
-        expect(JSON.stringify(dstRef.byRef)).toEqual("{\"c\":3}");
+        expect(JSON.stringify(dstRef.me)).toEqual("{\"c\":3}");
     });
 
     it("frozen prop can be assigned", () => {
 
         const dst = { a: Number(5), b: Object.freeze({ c: 3 }) };
         const src = { a: Number(7), b: { c: 333 } };
-        const dstRef = { byRef: dst };
+        const dstRef = { me: dst };
         mergeDeep(dstRef, src);
         expect(JSON.stringify(dst)).toEqual("{\"a\":7,\"b\":{\"c\":333}}");
         expect(Object.isFrozen(dst.b)).toBeTruthy();

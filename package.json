@@ -2,9 +2,15 @@
   "name": "freeze-mutate",
   "version": "1.0.0",
   "description": "Utility library for immutable objects management",
-  "main": "build/dist/index.js",
-  "typings": "build/dist/index.d.ts",
-  "types": "build/dist/index",
+  "keywords": ["immutable", "mutate", "freeze", "pojo", "DTO", "javascript", "typescript"],
+  "author": "eram@weblegions.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eram/freeze-mutate/issues"
+  },
+  "homepage": "https://github.com/eram/freeze-mutate#readme",
+  "main": "./build/dist/index.js",
+  "typings": "./build/dist/index.d.ts",
   "scripts": {
     "build": "npm run build:debug",
     "build:debug": "tsc -p ./config/tsconfig.debug.json --pretty",
@@ -18,8 +24,6 @@
     "pretest": "npm run clean && npm run lint && npm run build",
     "lint": "tslint --format stylish --config ./config/tslint.json --project ./config/tsconfig.json"
   },
-  "author": "eram@weblegions.com",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^23.3.1",
     "@types/node": "^10.9.4",
