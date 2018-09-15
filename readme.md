@@ -30,7 +30,7 @@ try {
     // we are frozen!
 }
 
-// 2 chnage sets...
+// 2 mutations with different chanage sets...
 var obj2 = mutate(obj1, { are: { belong: "to us" } });
 obj2 = mutate(obj2, { arr: [, "base2"] });
 
@@ -115,7 +115,7 @@ assert( Object.isFrozen(itr) );
 const m2 = { map: new Map([[2, m1]]) };
 const m3 = mutate(itr, m2);
 
-assert(m3 && m3.map.get(2) === m1);
+assert( m3 && m3.map.get(2) === m1 );
 assert( Object.isFrozen(m3.map) );
 ```
 
@@ -132,10 +132,9 @@ class Todo implements IFreezeMutate<Todo> {
     done: boolean = false;
 
     // IFreezeMutateCtor - constructor interface 
-    // the object is 'new'ed on mutation to create the un-frozen empty
-    // object that is then returen from the mutation.
-    // the ctor enforces the change-set to be a valid 
-    // subset of the existing properties.
+    // the object is 'new'ed on mutation to create the un-frozen empty object that is 
+    // then returen from the mutation. 
+    // the ctor enforces the change-set to be a valid subset of the existing properties.
     
     private static ctor: IFreezeMutateCtor<Todo> = Todo;
     constructor(todo?: Partial<Todo>) {
@@ -149,15 +148,16 @@ class Todo implements IFreezeMutate<Todo> {
         // don't freeze in ctor! ctor is called as part of mutation.
     }
 
-    // IfreezeMutate.freeze - function is called during freeze()
-    // 'this' object and its object properties should be frozen
+    // IfreezeMutate.freeze - interface
+    // the function is called during freeze()
+    // 'this' object and all object properties should be frozen in the function.
     freeze(): void {
         Object.freeze(this);
         Object.freeze(this.created);
     }
 
-    // IfreezeMutate.merge - function is called 2-3 times during mutate() to construct
-    // the returned object.
+    // IfreezeMutate.merge - interface 
+    // the function is called 2-3 times during mutate() to construct the returned object.
     merge(todo: Partial<Todo>): Readonly<Todo> {
 
         const todo2 = new Todo({
@@ -166,7 +166,7 @@ class Todo implements IFreezeMutate<Todo> {
             done: (todo.done !== undefined) ? todo.done : this.done
         });
 
-        // dont freeze in merge!
+        // don't freeze in merge!
         return todo2;
     }
 
@@ -176,12 +176,13 @@ class Todo implements IFreezeMutate<Todo> {
     }
 }
 
-// Note that you absolutely don't have too use these interfaces. It works just fine in most cases using just freeze and merge!
-// let's see a usage example 
+// note that you absolutely don't _have to_ extened and implement these interfaces. 
+// it works just fine in most cases using just freeze and merge!
+// let's see a usage example:
 
 const todo1 = freeze(new Todo({ done: true }));
 
-// you can mutate any existing prop. 
+// you can mutate any existing prop using a change-set. 
 // TS will complain if you try to add a new prop or change a prop's type!
 const todo2 = mutate(todo1, { id: 2, created: new Date(0) });
 
@@ -194,7 +195,7 @@ try {
     // todo2 is immutable too!
 }
 
-assert(todo2.toString() === "2: done");
+assert( todo2.toString() === "2: done" );
 ```
 
 More features:
