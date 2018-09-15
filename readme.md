@@ -14,7 +14,7 @@ Enough talking. Let's have a look...
 
 ## Supports deep-freeze and merge of objects during mutation:
 
-```
+```javascript
 const { mutate, freeze } = require("freeze-mutate");
 const assert = console.assert;
 
@@ -44,7 +44,7 @@ assert( Object.isFrozen(obj2.arr) );
 ## Supports for Set and Map and class objects
 (aka you might want to skip immutable.js)
 
-```
+```javascript
 // freeze and mutate an object with an extended Set
 
 class MySet extends Set {
@@ -82,7 +82,7 @@ assert( o3.set.toString() === "<MySet>{a,b,c,d}" );
 
 ## Supports cyclic objects 
 
-```
+```javascript
 // freeze and mutate a cyclic pojo
 const a = { a: undefined };
 a.a = a;
@@ -99,7 +99,7 @@ assert( Object.isFrozen(b.a) );
 
 ## An even more interesting cyclic object...
 
-```
+```javascript
 // a complex cyclic inside a Map
 
 const m1 = { map: new Map() };
@@ -121,7 +121,7 @@ assert( Object.isFrozen(m3.map) );
 
 ## For **Typescript** we have here some more goodies!
 
-```
+```typescript
 import { mutate, freeze, IFreezeMutate, IFreezeMutateCtor } from "freeze-mutate";
 
 class Todo implements IFreezeMutate<Todo> {
@@ -204,7 +204,7 @@ More features:
 1. Code is fully covered with jest tests.
 
 To get the source running locally:
-```
+```sh
 > git clone ...
 > cd ...
 > npm install
