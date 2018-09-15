@@ -1,5 +1,3 @@
-import { S_IFREG } from "constants";
-
 // tslint:disable:no-any
 
 function copyVal<T>(param: T): T {
@@ -34,16 +32,18 @@ function copyVal<T>(param: T): T {
     }
 
     if (Object.isFrozen(param)) freeze(rc, false);
-    return rc;
+    return rc as T;
 }
 
 function isObject(value: any): boolean {
-    return (value !== null && typeof value === 'object');
+    return (value !== null && typeof value === "object");
 }
 
 
 function mergeArrays<T>(dst: T[], src: T[]): void {
+
     src.forEach((val, key/*, me*/) => {
+        // skip a value that is undefined to allow growing an array
         if (val !== undefined) {
             dst[key] = copyDeep(dst[key], val);
 
@@ -91,52 +91,51 @@ const cycleDetector = new Set<Object>();
 
 function mergeDeep<T>(dst: { byRef: T }, src?: Partial<T>): void {
 
+    interface IndexSig { [key: string]: any; }
+
+    if (!dst || !isObject(dst)) return;
+
+    if (isObject(dst.byRef) && Object.isFrozen(dst.byRef)) {
+        console.error("mergeDeep: dst object is frozen");
+        return;
+    }
+
+    let ref = dst.byRef as IndexSig;
     do {
-        if (!dst || !isObject(dst)) break;
-
-        if (isObject(dst.byRef) && Object.isFrozen(dst.byRef)) {
-            console.error("mergeDeep: dst object is frozen");
-            break;
-        };
-
         if (!isObject(src)) {
-            dst.byRef = <T>src;
+            ref = <T>src;
             break;
         }
 
         if (cycleDetector.has(<Object>src)) {
             // this object was already merged
-            dst.byRef = <T>src;
+            ref = <T>src;
             break;
         }
+
         cycleDetector.add(<Object>src);
 
-        // IfreezeMutate.merge
-        if (typeof (<any>dst.byRef).merge === "function") {
-            dst.byRef = (<any>dst.byRef).merge(src);
+        // if IfreezeMutate.merge is implemented call it 
+        if (typeof ref.merge === "function") {
+            ref = ref.merge(src);
             break;
-        }
 
-        // if both src and dst are arrays we have a special case: we merge the
-        // arrays by their indexes instead of by their key names.
-        // do not override a value with an undefined
-        // copy into existing src indexes and push the rest
-        // typeof me[Symbol.iterator] === "function"
+        } else if (typeof (<any>ref)[Symbol.iterator] === "function"
+            && typeof (<any>src)[Symbol.iterator] === "function") {
 
-        else if (typeof (<any>dst.byRef)[Symbol.iterator] === "function" && typeof (<any>src)[Symbol.iterator] === "function") {
-
-            if (dst.byRef instanceof Array && src instanceof Array) {
-                mergeArrays(dst.byRef, src);
+            // if both src and dst are arrays we merge the arrays. same for set and map.
+            if (ref instanceof Array && src instanceof Array) {
+                mergeArrays(ref, src);
                 break;
             }
 
-            if (dst.byRef instanceof Set && src instanceof Set) {
-                mergeSets(dst.byRef, src);
+            if (ref instanceof Set && src instanceof Set) {
+                mergeSets(ref, src);
                 break;
             }
 
-            if (dst.byRef instanceof Map && src instanceof Map) {
-                mergeMaps(dst.byRef, src);
+            if (ref instanceof Map && src instanceof Map) {
+                mergeMaps(ref, src);
                 break;
             }
 
@@ -147,29 +146,30 @@ function mergeDeep<T>(dst: { byRef: T }, src?: Partial<T>): void {
         // if the src property is frozen the resulting propery should be frozen as well.
         // do not override a value with an undefined
         // if the proprty key is an integer we keep the propery as a number
-
-        Object.keys(<{}>src).forEach((key: string) => {
-            const prop = (<any>src)[key];
-            const toFreeze = (typeof prop === "object" && (<any>dst)[key] !== undefined && Object.isFrozen((<any>dst)[key]));
+        const s = src as IndexSig;
+        Object.keys(s).forEach((key: string) => {
+            const prop = s[key];
+            const toFreeze = (typeof prop === "object" && ref[key] !== undefined && Object.isFrozen(ref[key]));
 
             if (typeof prop !== "function" && prop !== undefined) {
 
                 // if the keys are numerical keep them as such
-                const intKey = parseInt(key);
+                const intKey = parseInt(key, 10);
                 if (isNaN(intKey)) {
-                    (<any>(dst.byRef))[key] = copyDeep((<any>(dst.byRef))[key], prop);
+                    ref[key] = copyDeep(ref[key], prop);
                 } else {
-                    (<any>(dst.byRef))[intKey] = copyDeep((<any>(dst.byRef))[intKey], prop);
+                    ref[intKey] = copyDeep(ref[intKey], prop);
                 }
 
                 if (toFreeze) {
-                    freeze((<any>(dst.byRef))[key], false);
+                    freeze(ref[key], false);
                 }
             }
         });
 
     } while (0);
 
+    dst.byRef = ref as T;
 }
 
 function createObj<T>(obj: T): T {
@@ -183,10 +183,10 @@ function createObj<T>(obj: T): T {
     } else if (typeof obj.constructor === "function") {
         rc = new (obj.constructor as { new(): T })();
     } else {
-        rc = Object.create(Object.getPrototypeOf(obj));
+        rc = Object.create(obj as Object);
     }
 
-    return rc;
+    return rc as T;
 }
 
 const primitiveWrappers = [Date, Number, String, Boolean];
@@ -219,62 +219,67 @@ function copyDeep<T>(first: T, second?: Partial<T>): T {
     return rc as T;
 }
 
-const neverFunc = (_p: any) => { throw ("Immutable object cannot be changed"); };
-
-function freeze<T>(me: T, deep = true): Readonly<T> {
-
-    if (isObject(me)) {
-
-        // call IFreezeMutate.freeze() if it exists
-        if (typeof (<any>me).freeze === "function") {
-            return (<any>me).freeze();
-
-        } else if (!Object.isFrozen(me)) {
-
-            if (typeof (<any>me)[Symbol.iterator] === "function") {
-
-                // clear the "set" functions of the objects
-                if (me instanceof Set || me instanceof Map) {
-                    if (typeof (<any>me).set === "function") (<any>me).set = neverFunc;
-                    if (typeof (<any>me).clear === "function") (<any>me).clear = neverFunc;
-                    if (typeof (<any>me).delete === "function") (<any>me).delete = neverFunc;
-                    if (typeof (<any>me).add === "function") (<any>me).add = neverFunc;
-                }
-                else if (me instanceof Array) {
-                    if (typeof (<any>me).copyWithin === "function") (<any>me).copyWithin = neverFunc;
-                    if (typeof (<any>me).concat === "function") (<any>me).concat = neverFunc;
-                    if (typeof (<any>me).fill === "function") (<any>me).fill = neverFunc;
-                    if (typeof (<any>me).join === "function") (<any>me).join = neverFunc;
-                    if (typeof (<any>me).pop === "function") (<any>me).pop = neverFunc;
-                    if (typeof (<any>me).push === "function") (<any>me).push = neverFunc;
-                    if (typeof (<any>me).unshift === "function") (<Array<T>>me).unshift = neverFunc;
-                }
-
-                Object.freeze(me);
-
-                if (deep) for (const prop of <any>me) {
-                    if (typeof prop === "object") {
-                        freeze(prop);
-                    }
-                }
-
-            } else {
-
-                Object.freeze(me);
-
-                if (deep) Object.keys(me).forEach((key: string) => {
-                    const prop = (<any>me)[key];
-                    if (typeof prop === "object") {
-                        freeze(prop);
-                    }
-                });
-            }
-
-        }
-    }
-    return me;
+function neverFunc(nop: any): any {
+    throw Error("Immutable object cannot be changed");
+    // tslint:disable-next-line:no-unused-expression
+    (nop);
 }
 
+function freeze(me: any, deep = true): Readonly<any> {
+
+    if (!isObject(me) || Object.isFrozen(me)) return me;
+
+    // call IFreezeMutate.freeze() if it exists
+    if (typeof me.freeze === "function") {
+        me.freeze();
+
+    } else {
+
+        let iteratable = false;
+
+        // clear the "set" functions of the iteratable objects
+        if (me instanceof Set) {
+
+            const me3 = me as Set<1>;
+            me3.delete = me3.add = neverFunc;
+            me3.clear = <any>neverFunc;
+            iteratable = true;
+
+        } else if (me instanceof Map) {
+
+            const me3 = me as Map<1, 1>;
+            me3.set = me3.delete = neverFunc;
+            me3.clear = <any>neverFunc;
+            iteratable = true;
+
+        } else if (me instanceof Array) {
+            const me3 = me as 1[];
+            me3.copyWithin = me3.concat = me3.fill = me3.join = me3.push = me3.unshift = neverFunc;
+            me3.pop = <any>neverFunc;
+            iteratable = true;
+        }
+
+        Object.freeze(me);
+
+        if (deep && iteratable) {
+            for (const prop of <any>me) {
+                if (typeof prop === "object") {
+                    freeze(prop);
+                }
+            }
+        }
+
+        if (deep && !iteratable) {
+            Object.keys(me)
+                .filter((key) => (typeof me[key] === "object"))
+                .forEach((key: string) => {
+                    freeze(me[key]);
+                });
+        }
+    }
+
+    return me;
+}
 
 function mutate<T>(first: T, second?: Partial<T | undefined>): Readonly<T> {
     const rc = copyDeep(first, second);
@@ -291,6 +296,7 @@ interface IFreezeMutateCtor<T> {
 interface IFreezeMutate<T> {
     freeze(): void;
     merge(src: Partial<T>): Readonly<T>;
+    [key: string]: any;
 }
 
 

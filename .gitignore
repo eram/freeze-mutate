@@ -31,6 +31,7 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+build
 
 # Dependency directories
 node_modules/
@@ -48,7 +49,7 @@ typings/
 # Optional REPL history
 .node_repl_history
 
-# Output of 'npm pack'
+# build of 'npm pack'
 *.tgz
 
 # Yarn Integrity file
@@ -57,5 +58,5 @@ typings/
 # dotenv environment variables file
 .env
 
-# next.js build output
+# next.js build build
 .next

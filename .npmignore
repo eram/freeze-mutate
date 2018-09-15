@@ -1,4 +1,4 @@
 /node_modules
-/output/debug
-/output/reports
+/build/debug
+/build/reports
 

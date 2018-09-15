@@ -1,2 +1,6 @@
 {
+    "tslint.configFile": "./config/tslint.json",
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.enabled": false,
+    "gitlens.codeLens.enabled": false
 }

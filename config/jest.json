@@ -9,10 +9,10 @@
   },
   "rootDir": "../",
   "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-  "testPathIgnorePatterns": ["/lib/", "/node_modules/", "/output/"],
+  "testPathIgnorePatterns": ["/lib/", "/node_modules/", "/build/"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "collectCoverage": true,
-  "coverageDirectory": "<rootDir>/output/reports",
+  "coverageDirectory": "<rootDir>/build/reports",
   "collectCoverageFrom": [
     "src/**/*.ts",
     "!src/**/*.spec.ts",

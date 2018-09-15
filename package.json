@@ -2,19 +2,19 @@
   "name": "freeze-mutate",
   "version": "1.0.0",
   "description": "Utility library for immutable objects management",
-  "main": "output/src/index.js",
-  "typings": "output/src/index.d.ts",
-  "types": "output/index",
+  "main": "build/dist/index.js",
+  "typings": "build/dist/index.d.ts",
+  "types": "build/dist/index",
   "scripts": {
-    "build": "tsc -p ./config/tsconfig.json --pretty",
+    "build": "npm run build:debug",
     "build:debug": "tsc -p ./config/tsconfig.debug.json --pretty",
     "build:prod": "tsc -p ./config/tsconfig.release.json --pretty",
     "test": "jest --coverage --no-cache --config ./config/jest.json",
     "test:nocover": "jest --config ./config/jest.json",
     "test:watch": "jest --watch --config ./config/jest.json",
     "start": "npm run build:live",
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node --project ./config/tsconfig.debug.json -- ./src/index.ts",
-    "clean": "rimraf ./output",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node --project ./config/tsconfig.debug.json --pretty -- ./src/index.ts",
+    "clean": "rimraf ./build",
     "pretest": "npm run clean && npm run lint && npm run build",
     "lint": "tslint --format stylish --config ./config/tslint.json --project ./config/tsconfig.json"
   },
@@ -32,8 +32,5 @@
     "tslint-microsoft-contrib": "^5.2.1",
     "typescript": "^3.0.3"
   },
-  "dependencies": {
-    "lodash": "^4.17.10",
-    "npm": "^6.4.1"
-  }
+  "dependencies": {}
 }

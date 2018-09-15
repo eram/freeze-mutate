@@ -27,7 +27,7 @@
                 "${workspaceRoot}/node_modules/jest/bin/jest.js",
                 "--runInBand",
                 "--config",
-                "${workspaceRoot}\\config\\jest.json"
+                "${workspaceRoot}/config/jest.json"
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
