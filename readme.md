@@ -51,7 +51,7 @@ class MySet extends Set {
     constructor(arr) {
         super(arr);
         this.toString = () => {
-            let rc = "<MySet>{";
+            var rc = "<MySet>{";
             this.forEach(a => { rc += `${a},`; });
             rc = `${rc.substr(0, rc.length - 1)}}`;
             return rc;
@@ -206,12 +206,12 @@ More features:
 
 To get the source running locally:
 ```sh
-> git clone ...
-> cd ...
+> git clone https://github.com/eram/freeze-mutate.git freeze-mutate
+> cd freeze-mutate
 > npm install
 > npm test
 ```
-Pls open bugs and send pull requests. You are welcome to star/clap/like/share to show me how awesome you are and help others find this lib. ;-)
+Pls open bugs and send me pull requests. You are welcome to star/clap/like/share to show me how awesome you are and help others find this lib. ;-)
 
 Cheers!
 
