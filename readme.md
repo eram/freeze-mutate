@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/eram/freeze-mutate.svg?branch=master)](https://travis-ci.org/eram/freeze-mutate)
 <img src="https://forthebadge.com/images/badges/winter-is-coming.svg" 
-alt="be prepared!" height="20"/>
+alt="be prepared!" height="20"/>  [![npm package](https://badge.fury.io/js/freeze-mutate.png)](https://www.npmjs.com/package/freeze-mutate)
 
 # Freeze-Mutate - A KISS immutable utility library for JS and TS.
 
