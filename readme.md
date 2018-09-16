@@ -1,18 +1,15 @@
 
 # Freeze-Mutate - A KISS immutable utility library for JS and TS.
 
-Welcome. `freeze-mutate` is a Javascript/Typescript-based npm module that was born after looking for a good utility library, to help me get my DTOs immutable. The libraries I found were an overkill (immutable.js) or lacking support for deep merging of objects during mutations. Or they where making my code ugly with lots of function calls for each change-set. So I wrote the below to help me keep things simple and neat...
+Welcome!
+I was looking for a nice little module that would help me get my DTOs immutable. The libraries I found were either an overkill (immutable.js), lacking support for deep merging of objects during mutations, or they were making my code ugly with lots of function calls for each change. So that's how freeze-mutate came to life: a Javascript/Typescript-based npm module that helps me keep things simple and neat.
+* **Freeze** any object and it becomes **immutable**: all its properties and child-objects in the process. This is done using Javascript native Object.freeze.
+* **Mutate** a frozen object with a **change-set** and you get a new frozen object that is a merge, or an overlay,  of the the change-set on top of the original object. Again, this is a deep-merge that also works with **Arrays**, **Sets**, **Maps**, and your own custom **classes**. For the brave: you can provide custom freeze and merge functions.
+* Using **Typescript** you get all the goodies of **generics**, enforcing the validity of the change-set, **Readonly** returned types and interfaces for the custom functions.
 
-Freeze any object and it becomes immutable - all its properies are deep-frozed in the processes. Including child objects. This is done using Javascript native Object.freeze.
+Enough talking. Let's see some action…
 
-Mutate a frozen object with a change-set and you get a new frozen object that is a **merge** of the original object and the change-set. Again, this is a deep-merge that would also merge Arrays, Sets, Maps and your own custom classes etc.
-For the brave: you can provide custom freeze and merge functions.
-
-Using Typescript you get all the goodies of generics, enforcing the validity of the change set, Readonly returned types and interfaces for the custom functions.
-
-Enough talking. Let's have a look...
-
-## Supports deep-freeze and merge of objects during mutation:
+## Deep-freezing and merging of objects during mutation:
 
 ```javascript
 const { mutate, freeze } = require("freeze-mutate");
@@ -40,8 +37,7 @@ assert( JSON.stringify(obj2) === JSON.stringify({
     arr:["base1","base2"]}) );
 assert( Object.isFrozen(obj2.arr) );
 ```
-
-## Supports for Set and Map and class objects
+## Support for Set and Map and class objects
 (aka you might want to skip immutable.js)
 
 ```javascript
@@ -79,8 +75,7 @@ assert( o3.set.has("c") );
 assert( o1.set.size < o3.set.size );
 assert( o3.set.toString() === "<MySet>{a,b,c,d}" );
 ```
-
-## Supports cyclic objects 
+## Support for cyclic objects 
 
 ```javascript
 // freeze and mutate a cyclic pojo
@@ -96,7 +91,6 @@ assert( b.b.a !== undefined );
 assert( b.a.a === a );
 assert( Object.isFrozen(b.a) );
 ```
-
 ## An even more interesting cyclic object...
 
 ```javascript
@@ -118,7 +112,6 @@ const m3 = mutate(itr, m2);
 assert( m3 && m3.map.get(2) === m1 );
 assert( Object.isFrozen(m3.map) );
 ```
-
 ## For **Typescript** we have here some more goodies!
 
 ```typescript
@@ -197,8 +190,7 @@ try {
 
 assert( todo2.toString() === "2: done" );
 ```
-
-More features:
+## More features:
 1. Zero dependencies and just 2 KB pkg.
 1. Can be loaded in a browser.
 1. Be careful with mutating large objects, arrays and Maps - this is heavy!
