@@ -8,7 +8,7 @@
       "^.+\\.tsx?$": "ts-jest"
   },
   "rootDir": "../",
-  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts|tsx|jsx)?$",
   "testPathIgnorePatterns": ["/lib/", "/node_modules/", "/build/"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "collectCoverage": true,
