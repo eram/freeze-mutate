@@ -1,8 +1,16 @@
 {
   "name": "freeze-mutate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility library for immutable objects management",
-  "keywords": ["immutable", "mutate", "freeze", "pojo", "DTO", "javascript", "typescript"],
+  "keywords": [
+    "immutable",
+    "mutate",
+    "freeze",
+    "pojo",
+    "DTO",
+    "javascript",
+    "typescript"
+  ],
   "author": "eram@weblegions.com",
   "license": "ISC",
   "bugs": {
