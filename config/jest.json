@@ -9,7 +9,7 @@
   },
   "rootDir": "../",
   "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts|tsx|jsx)?$",
-  "testPathIgnorePatterns": ["/lib/", "/node_modules/", "/build/"],
+  "testPathIgnorePatterns": ["/lib/", "/node_modules/", "<rootDir>/build/"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
   "collectCoverage": true,
   "coverageDirectory": "<rootDir>/build/reports",
