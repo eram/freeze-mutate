@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/eram/freeze-mutate.svg?branch=master)](https://travis-ci.org/eram/freeze-mutate)
+[![Build Status](https://travis-ci.org/eram/freeze-mutate.svg?branch=master)](https://travis-ci.org/eram/freeze-mutate)   [![npm package](https://badge.fury.io/js/freeze-mutate.svg)](https://www.npmjs.com/package/freeze-mutate) 
 <img src="https://forthebadge.com/images/badges/winter-is-coming.svg" 
-alt="be prepared!" height="20"/>  [![npm package](https://badge.fury.io/js/freeze-mutate.png)](https://www.npmjs.com/package/freeze-mutate)
+alt="be prepared!" height="20"/>
 
-# Freeze-Mutate - A KISS immutable utility library for JS and TS.
+# Freeze-Mutate - An immutable utility library for JS and TS that's a KISS!
 
 Welcome!
 I was looking for a nice little module that would help me get my DTOs immutable. The libraries I found were either an overkill (immutable.js), lacking support for deep merging of objects during mutations, or they were making my code ugly with lots of function calls for each change. So that's how freeze-mutate came to life: a Javascript/Typescript-based npm module that helps me keep things simple and neat.

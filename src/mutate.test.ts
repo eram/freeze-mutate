@@ -42,6 +42,12 @@ describe("primitive objects", () => {
         expect(() => {
             (<any>arr2)[1] = 1111;
         }).toThrow();
+
+        expect(() => {
+            arr2.push(1111);
+        }).toThrow();
+
+
     });
 
     it("add elements to frozen array", () => {
@@ -71,6 +77,61 @@ describe("primitive objects", () => {
         expect(() => {
             arr2.arr[1] = 1111;
         }).toThrow();
+    });
+
+    it("array concat object deep", () => {
+
+        const obj0 = {}, obj1 = {}, obj2 = {}, obj3 = {};
+        let arr = freeze([obj0, obj1, obj2]);
+
+        expect(Object.isFrozen(arr[1])).toBeTruthy();
+        expect(() => {
+            arr.push({});
+        }).toThrow();
+        expect(() => {
+            (<any>obj0).param = 0;
+        }).toThrow();
+
+        arr = arr.concat(obj3);
+        expect(arr).toStrictEqual([obj0, obj1, obj2, obj3]);
+
+        // if we called out overwritten concat than objects should have been copied.
+        (<any>obj3).param = 0;
+        expect(arr[3]).not.toStrictEqual(obj3);
+        delete (<any>obj3).param;
+
+        expect(Object.isFrozen(arr)).toBeFalsy();
+        expect(Object.isFrozen(arr[1])).toBeTruthy(); // obj1 was frozen before the concat
+    });
+
+    it("array concat array deep", () => {
+
+        const obj0 = {}, obj1 = {}, obj2 = {}, obj3 = {}, obj4 = {}, obj5 = {};
+        let arr = freeze([obj0, obj1, obj2]);
+
+        arr = arr.concat([obj3, obj4]);
+        expect(arr).toStrictEqual([obj0, obj1, obj2, obj3, obj4]);
+
+        // did we copy obj4 ?
+        (<any>obj4).param = 0;
+        expect(arr[4]).not.toStrictEqual(obj4);
+        delete (<any>obj4).param;
+
+        expect(Object.isFrozen(arr[4])).toBeFalsy(); // obj4 was not frozen before the concat
+        expect(() => {
+            arr.push(obj5);
+        }).not.toThrow();
+    });
+
+    it("Date is frozen", () => {
+
+        const d1 = freeze(new Date(0));
+
+        expect(Object.isFrozen(d1)).toBeTruthy();
+        expect(() => {
+            d1.setHours(1);
+        }).toThrow();
+
     });
 
 });

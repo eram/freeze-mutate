@@ -224,14 +224,84 @@ function copyDeep<T>(first: T, second?: Partial<T>): T {
 }
 
 function neverFunc(nop: any): any {
-    throw Error("Immutable object cannot be changed");
+    const msg = "Immutable object cannot be changed";
+    if (process.env.NODE_ENV !== "production") {
+        throw Error(msg);
+    } else {
+        console.error(msg);
+    }
     // tslint:disable-next-line:no-unused-expression
     (nop);
 }
 
+const arrConcat = function <T>(this: T[], ...items: (any | ConcatArray<T>)[]): T[] {
+    const rc: T[] = [];
+
+    // tslint:disable-next-line:no-invalid-this
+    this.forEach((val) => { rc.push(copyVal(val)); });
+    items.forEach(arr => {
+        if (arr instanceof Array) {
+            arr.forEach((val: T) => {
+                rc.push(copyVal(val));
+            });
+        } else {
+            rc.push(copyVal(arr));
+        }
+    });
+    return rc;
+};
+
+function knownTypesFreezer<T>(obj: T): boolean {
+
+    let iteratable = false;
+
+    // clear the "set" functions of the iteratable objects
+    const me = obj as IndexSig;
+
+    if (obj instanceof Set) {
+
+        ["delete", "add", "clear"].forEach((fn) => { me[fn] = neverFunc; });
+        iteratable = true;
+
+    } else if (obj instanceof Map) {
+
+        ["set", "delete", "clear"].forEach((fn) => { me[fn] = neverFunc; });
+        iteratable = true;
+
+    } else if (obj instanceof Array) {
+
+        ["copyWithin", "fill", "join", "push", "unshift", "pop", "reverse"].forEach((fn) => { me[fn] = neverFunc; });
+        me.concat = arrConcat; // special case: the array is not changed and a new array is returned 
+        iteratable = true;
+
+    } else if (obj instanceof Date) {
+
+        const funcs = ["setDate", "setFullYear", "setHours", "setMilliseconds", "setMinutes", "setMonth", "setSeconds", "setTime", "setFullYear", "setUTCDate", "setUTCFullYear"];
+        funcs.forEach((fn) => { me[fn] = neverFunc; });
+    }
+
+    return iteratable;
+}
+
+
+// flies", blobs and react elements are immutable objects
+function isKnownImmutable(obj: any): boolean {
+
+    // https://github.com/facebook/react/blob/v15.0.1/src/isomorphic/classic/element/ReactElement.js#L21
+    const REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element");
+    const REACT_ELEMENT_TYPE_FALLBACK = 0xEAC7;
+
+    return (obj.$$typeof === REACT_ELEMENT_TYPE_FALLBACK || obj.$$typeof === REACT_ELEMENT_TYPE) ||
+        obj instanceof File ||
+        obj instanceof Blob ||
+        obj instanceof Error;
+}
+
 function freeze<T>(me: T, deep = true): Readonly<T> {
 
-    if (!isObject(me) || Object.isFrozen(me)) return me;
+    if (!isObject(me) || isKnownImmutable(me) || Object.isFrozen(me)) {
+        return me;
+    }
 
     const obj = me as IndexSig;
 
@@ -241,29 +311,7 @@ function freeze<T>(me: T, deep = true): Readonly<T> {
 
     } else {
 
-        let iteratable = false;
-
-        // clear the "set" functions of the iteratable objects
-        if (obj instanceof Set) {
-
-            const me3 = obj as Set<1>;
-            me3.delete = me3.add = neverFunc;
-            me3.clear = <any>neverFunc;
-            iteratable = true;
-
-        } else if (obj instanceof Map) {
-
-            const me3 = obj as Map<1, 1>;
-            me3.set = me3.delete = neverFunc;
-            me3.clear = <any>neverFunc;
-            iteratable = true;
-
-        } else if (obj instanceof Array) {
-            const me3 = obj as 1[];
-            me3.copyWithin = me3.concat = me3.fill = me3.join = me3.push = me3.unshift = neverFunc;
-            me3.pop = <any>neverFunc;
-            iteratable = true;
-        }
+        const iteratable = knownTypesFreezer(obj);
 
         Object.freeze(obj);
 
@@ -284,6 +332,7 @@ function freeze<T>(me: T, deep = true): Readonly<T> {
         }
     }
 
+    Object.setPrototypeOf = <any>neverFunc;
     return obj as Readonly<T>;
 }
 

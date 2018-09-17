@@ -4,3 +4,4 @@
 /config
 /src
 /.vscode
+.travis.yml

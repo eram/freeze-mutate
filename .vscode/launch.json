@@ -33,6 +33,23 @@
             "internalConsoleOptions": "neverOpen",
             "sourceMaps": true,
             "port": 9229
+        },
+        {
+            "name": "WSL Debug Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "/mnt/c/src/eram/freeze-mutate/node_modules/jest/bin/jest.js",
+                "--runInBand",
+                "--config",
+                "/mnt/c/src/eram/freeze-mutate/config/jest.json"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "sourceMaps": true,
+            "port": 9229,
+            "useWSL": true 
         }
     ]
 }
