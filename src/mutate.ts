@@ -245,7 +245,7 @@ const arrConcat = function <T>(this: T[], ...items: (any | ConcatArray<T>)[]): T
                 rc.push(copyVal(val));
             });
         } else {
-            rc.push(copyVal(arr));
+            rc.push(copyVal(<T>arr));
         }
     });
     return rc;
@@ -291,7 +291,8 @@ function isKnownImmutable(obj: any): boolean {
     const REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element");
     const REACT_ELEMENT_TYPE_FALLBACK = 0xEAC7;
 
-    return (obj.$$typeof === REACT_ELEMENT_TYPE_FALLBACK || obj.$$typeof === REACT_ELEMENT_TYPE) ||
+    return ((<IndexSig>obj).$$typeof === REACT_ELEMENT_TYPE_FALLBACK) ||
+        ((<IndexSig>obj).$$typeof === REACT_ELEMENT_TYPE) ||
         obj instanceof File ||
         obj instanceof Blob ||
         obj instanceof Error;
