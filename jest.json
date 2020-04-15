@@ -1,0 +1,25 @@
+{
+  "globals": {
+    "ts-jest": {
+      "tsConfigFile": "tsconfig.json"
+    }
+  },
+  "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+  },
+  "rootDir": "./",
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts|tsx|jsx)?$",
+  "testPathIgnorePatterns": ["/lib/", "/node_modules/", "<rootDir>/build/"],
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+  "collectCoverage": true,
+  "coverageDirectory": "<rootDir>/build/reports",
+  "collectCoverageFrom": [
+    "src/**/*.ts",
+    "!src/**/*.spec.ts",
+    "!src/**/*.d.ts",
+    "!src/**/index.ts",
+    "!src/**/*.test.*"
+  ],
+  "coverageReporters": ["html", "lcov", "text"]
+
+}
