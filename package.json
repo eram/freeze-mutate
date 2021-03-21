@@ -30,7 +30,7 @@
     "test": "eslint --color src/**/*.ts && jest --coverage --no-cache",
     "test:nocover": "jest",
     "dev": "jest --watch",
-    "clean": "rimraf ./dist",
+    "clean": "rimraf dist coverage",
     "pretest": "npm run clean && npm run lint && npm run build",
     "lint": "eslint --color --fix src/**/*.ts && echo Lint complete."
   },

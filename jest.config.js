@@ -32,6 +32,7 @@ module.exports = {
     "\\\\node_modules\\\\",
     "\\index.(tsx?|jsx?)$",
     "\\coverage\\",
+    "\\dist\\",
   ],
 
   // A list of reporter names that Jest uses when writing coverage reports
@@ -172,6 +173,7 @@ module.exports = {
   // will skip transformation
   transformIgnorePatterns: [
     "\\\\node_modules\\\\",
+    "\\\\dist\\\\",
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader
