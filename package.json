@@ -17,12 +17,9 @@
     "url": "https://github.com/eram/freeze-mutate/issues"
   },
   "homepage": "https://github.com/eram/freeze-mutate#readme",
-  "main": "./dist/src/index.js",
+  "entry": "./dist/src/index.js",
   "typings": "./dist/src/index.d.ts",
-  "files": [
-    "./dist/src/*.d.ts",
-    "./dist/src/*.js"
-  ],
+  "files": ["dist/src/*.[jt]s"],
   "scripts": {
     "build": "tsc --pretty --declaration",
     "test": "eslint --color src/**/*.ts && jest --coverage --no-cache",
