@@ -17,11 +17,10 @@
     "url": "https://github.com/eram/freeze-mutate/issues"
   },
   "homepage": "https://github.com/eram/freeze-mutate#readme",
-  "entry": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
   "files": [
-    "dist/*.[jt]s",
-    "dist/src"
+    "index*.[jt]s",
+    "dist/src/mutate.js",
+    "dist/src/mutate.d.ts"
   ],
   "engines": {
     "node": ">=14"
