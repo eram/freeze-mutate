@@ -1,6 +1,6 @@
 {
   "name": "freeze-mutate",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Utility library for immutable objects management",
   "keywords": [
     "immutable",
@@ -19,7 +19,10 @@
   "homepage": "https://github.com/eram/freeze-mutate#readme",
   "main": "./dist/src/index.js",
   "typings": "./dist/src/index.d.ts",
-  "files": ["./dist/src/*.d.ts", "./dist/src/*.js"],
+  "files": [
+    "./dist/src/*.d.ts",
+    "./dist/src/*.js"
+  ],
   "scripts": {
     "build": "tsc --pretty --declaration",
     "test": "eslint --color src/**/*.ts && jest --coverage --no-cache",
