@@ -1,6 +1,6 @@
 {
   "name": "freeze-mutate",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "Utility library for immutable objects management",
   "keywords": [
     "immutable",
