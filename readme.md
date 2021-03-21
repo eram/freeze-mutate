@@ -63,7 +63,7 @@ const set2 = o1.set.add("b");
 
 assert( o1.set === set2 );
 
-// time to freeze and mutate with a change-set
+// time to freeze and then mutate with a change-set
 freeze(o1);
 try { 
     // functions that enable mutation of the Set/Map/Array are now throwing. 
