@@ -1,6 +1,6 @@
 {
   "name": "freeze-mutate",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Utility library for immutable objects management",
   "keywords": [
     "immutable",
@@ -25,7 +25,7 @@
   ],
   "engines": {
     "node": ">=14"
-  },  
+  },
   "scripts": {
     "build": "tsc --pretty --declaration",
     "test": "eslint --color src/**/*.ts && jest --coverage --no-cache",
