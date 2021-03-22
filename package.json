@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "tsc --pretty --declaration",
-    "test": "eslint --color src/**/*.ts && jest --coverage --no-cache",
+    "test": "jest --coverage --no-cache",
     "test:nocover": "jest",
     "dev": "jest --watch",
     "clean": "rimraf dist coverage",
