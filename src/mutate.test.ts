@@ -1,4 +1,4 @@
-import { mutate, freeze, mergeDeep, IFreezeMutate } from "./mutate";
+import { mutate, freeze, mergeDeep, IFreezeMutate, produce } from "./mutate";
 
 it("jest is working", () => {
   expect(1).toBe(1);
@@ -8,7 +8,7 @@ describe("primitive objects", () => {
 
   it("native object", () => {
     const a = 0;
-    const a1 = freeze(a);
+    const a1 = freeze(a as never);
     const a2 = mutate(a1, 2 as never);
 
     expect(Object.isFrozen(a1)).toBe(true);
@@ -407,10 +407,10 @@ describe("edge cases behaviour", () => {
     expect(JSON.stringify(a)).toEqual("{\"a\":2}");
   });
 
-  it("null object", () => {
+  it("null object cases", () => {
     let a: unknown = 0;
     // eslint-disable-next-line no-null/no-null
-    a = mutate(a, null);
+    a = mutate(a as object, null);
     expect(JSON.stringify(a)).toEqual("null");
 
     let b = { a: 0 };
@@ -419,7 +419,7 @@ describe("edge cases behaviour", () => {
     expect(JSON.stringify(b)).toEqual("null");
   });
 
-  it("odd types", () => {
+  it("odd type cases", () => {
 
     const a = freeze({
       date: new Date(1),
@@ -452,7 +452,44 @@ describe("edge cases behaviour", () => {
     expect(typeof b.bigi).toEqual("bigint");
     expect(typeof b.str).toEqual("string");
     expect(typeof b.bool).toEqual("boolean");
-    expect(b).toEqual({ date: new Date(0), num:0, bigi: 1n, str:"0", bool:false, dontcare1: {}, dontcare2: 2 });
+    expect(b).toEqual({ date: new Date(0), num: 0, bigi: 1n, str: "0", bool: false, dontcare1: {}, dontcare2: 2 });
   });
 });
 
+
+// tests from similar to immer/produce (minimal changes applied for jest version)
+describe("produce", () => {
+
+  test("changes made in callback", () => {
+
+    const baseState = [
+      {
+        todo: "Learn typescript",
+        done: true,
+      },
+      {
+        todo: "Try immer",
+        done: false,
+      },
+    ];
+
+    const nextState = produce(baseState, draftState => {
+      draftState.push({ todo: "Tweet about it", done: false });
+      draftState[1].done = true;
+    });
+
+    // the new item is only added to the next state,
+    // base state is unmodified
+    expect(baseState.length).toBe(2);
+    expect(nextState.length).toBe(3);
+
+    // same for the changed 'done' prop
+    expect(baseState[1].done).toBe(false);
+    expect(nextState[1].done).toBe(true);
+
+    // unchanged data is structurally shared
+    expect(nextState[0]).toStrictEqual(baseState[0]);
+    // changed data not (dûh)
+    expect(nextState[1]).not.toBe(baseState[1]);
+  });
+});
