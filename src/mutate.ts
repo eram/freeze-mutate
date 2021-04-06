@@ -42,7 +42,7 @@ function mergeSets<T extends Set<T>>(dst: T, src: T): void {
 }
 
 
-function mergeMaps<T, V>(dst: Map<T, V>, src: Map<T, V>): void {
+function mergeMaps<T extends Map<T, V>, V extends object>(dst: Map<T, V>, src: Map<T, V>): void {
   src.forEach((val, key) => {
     let param;
     const dstVal = dst.get(key);
@@ -60,7 +60,7 @@ function mergeMaps<T, V>(dst: Map<T, V>, src: Map<T, V>): void {
 }
 
 
-function createObj(obj: Object): Object {
+function createObj(obj: object): object {
   let rc;
 
   if (isObject(obj)) {
@@ -69,7 +69,7 @@ function createObj(obj: Object): Object {
     } else if (typeof obj.constructor === "function") {
       rc = new (obj.constructor as { new(): typeof obj })();
     } else {
-      rc = Object.create(obj as Object);
+      rc = Object.create(obj as object);
     }
 
     Object.setPrototypeOf(rc, Object.getPrototypeOf(obj));
@@ -79,7 +79,7 @@ function createObj(obj: Object): Object {
 }
 
 
-function copyDeep(first: Object, second?: Object): Object {
+function copyDeep(first: object, second?: object): object {
 
   let rc;
   const firstIsObject = isObject(first);
@@ -91,7 +91,7 @@ function copyDeep(first: Object, second?: Object): Object {
     rc = copyVal(second);
 
   } else {
-    // create a new Object and copy the frozen first into it then copy the second ontop.
+    // create a new object and copy the frozen first into it then copy the second ontop.
     // we don't call copyParam here, so that rc does not get frozen and can be merged.
     const rcRef = mergeDeep(createObj(first), first);
     rc = mergeDeep(rcRef, second);
@@ -114,7 +114,7 @@ function arrConcat(items: []): [] {
 }
 
 
-function knownTypesFreezer<T extends Object>(obj: T): boolean {
+function knownTypesFreezer<T extends object>(obj: T): boolean {
 
   let iteratable = false;
   const me = obj as any;
@@ -162,12 +162,12 @@ function isKnownImmutable(obj: unknown): boolean {
 }
 
 
-export function mergeDeep<T extends Object>(me: T, changeSet?: Partial<T>): T {
+export function mergeDeep<T extends object>(me: T, changeSet?: Partial<T>): T {
 
   const dst = me as any;
   const chs = changeSet as any;
 
-  if (!dst || (isObject(dst) && Object.isFrozen(dst))) {
+  if (!dst || (isObject(dst) && Object.isFrozen(dst)) || typeof chs === "undefined") {
     console.error("mergeDeep: dst cannot be changed");
     return dst as T;
   }
@@ -207,7 +207,7 @@ export function mergeDeep<T extends Object>(me: T, changeSet?: Partial<T>): T {
     return dst as T;
   }
 
-  // deep-copy properties from src Object into dst
+  // deep-copy properties from src object into dst
   // if the src property is frozen the resulting propery should be frozen as well.
   // do not override a value with an undefined
   // if the proprty key is an integer we keep the propery as a number
@@ -259,16 +259,16 @@ function copyVal(param: any): any {
   } else if (param instanceof Date) {
     rc = new Date(param.valueOf());
   } else {
-    // Object
+    // object
     rc = mergeDeep(createObj(param), param);
   }
 
-  if (Object.isFrozen(param)) freeze(rc, false);
+  if (Object.isFrozen(param)) freeze(rc as object, false);
   return rc;
 }
 
 
-export function freeze<T extends Object>(me: T, deep = true): Readonly<T> {
+export function freeze<T extends object>(me: T, deep = true): Readonly<T> {
 
   if (!isObject(me) || isKnownImmutable(me) || Object.isFrozen(me)) {
     return me;
@@ -307,7 +307,7 @@ export function freeze<T extends Object>(me: T, deep = true): Readonly<T> {
 
 // take an object and a change-set on the object and return a new object that is a merge of both.
 // this is done deep: merges keys, arrays, sets etc.
-export function mutate<T extends Object, S extends Object>(me: T, changeSet?: Partial<T & S> & Object): Readonly<T & S> {
+export function mutate<T extends object, S extends Partial<T>>(me: T, changeSet?: Partial<T | S>): T & S {
   console.assert(!cycleDetector.size);
   // cycleDetector.add(me);
   const rc = copyDeep(me, changeSet);
@@ -317,15 +317,21 @@ export function mutate<T extends Object, S extends Object>(me: T, changeSet?: Pa
 
 // interface for CTor and class that implements IFreezeMutate
 // methods: ctor(), freeze() and mutate();
-export interface IFreezeMutateCtor<T extends Object> {
+export interface IFreezeMutateCtor<T extends object> {
   new (src?: Partial<T>): IFreezeMutate<T>;
 }
 
 // interface to implement if you want to have a custom freeze and merge functions calls on your objects
 // when it is mutated.
-export interface IFreezeMutate<T extends Object> {
+export interface IFreezeMutate<T extends object> {
   freeze(): void;
   merge(changeSet: Partial<T>): Readonly<T>;
 }
 
+// make changes inside a callback function (similar to immer/produce)
+export function produce<T extends object, S extends Partial<T>>(first: T, cb: (darft: S) => void) {
+  const temp = copyDeep(first);
+  cb(temp as S);
+  return temp as unknown as Readonly<T & S>;
 
+}

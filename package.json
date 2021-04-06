@@ -1,12 +1,16 @@
 {
   "name": "freeze-mutate",
-  "version": "2.0.6",
+  "version": "1.3.0",
   "description": "Utility library for immutable objects management",
   "keywords": [
     "immutable",
     "mutate",
     "freeze",
+    "deepCopy",
+    "deepFreeze",
     "pojo",
+    "produce",
+    "immer/produce",
     "DTO",
     "javascript",
     "typescript"
