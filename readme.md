@@ -10,7 +10,7 @@ I was looking for a nice little module that would help me get my DTOs immutable.
 * **Mutate** a frozen object with a **change-set** and you get a new frozen object that is a merge, or an overlay,  of the the change-set on top of the original object. Again, this is a deep-merge that also works with **Arrays**, **Sets**, **Maps**, and your own custom **classes**. For the brave: you can provide custom freeze and merge functions.
 * Using **Typescript** you get all the goodies of **generics**, enforcing the validity of the change-set, **Readonly** returned types and interfaces for the custom functions.
 
-Enough talking. Let's see some action…
+Enough talking. Let's see it in action…
 
 ## Deep-freezing and merging of objects during mutation:
 
@@ -115,61 +115,63 @@ const m3 = mutate(itr, m2);
 assert( m3 && m3.map.get(2) === m1 );
 assert( Object.isFrozen(m3.map) );
 ```
+
 ## For **Typescript** we have here some more goodies!
+
 
 ```typescript
 import { mutate, freeze, IFreezeMutate, IFreezeMutateCtor } from "freeze-mutate";
 
 class Todo implements IFreezeMutate<Todo> {
 
-    private static autoId = 0;
-    id: number = ++Todo.autoId;
-    created = new Date();
-    done: boolean = false;
+  private static autoId = 0;
+  id: number = ++Todo.autoId;
+  created = new Date();
+  done: boolean = false;
 
-    // IFreezeMutateCtor - constructor interface 
-    // the object is 'new'ed on mutation to create the un-frozen empty object that is 
-    // then returen from the mutation. 
-    // the ctor enforces the change-set to be a valid subset of the existing properties.
-    
-    private static ctor: IFreezeMutateCtor<Todo> = Todo;
-    constructor(todo?: Partial<Todo>) {
-        if (todo && Todo.ctor) {
-            Object.keys(todo).forEach(key => {
-                const t = todo as any;
-                const me = this as any;
-                if (me[key] !== undefined) me[key] = t[key];
-            });
-        }
-        // don't freeze in ctor! ctor is called as part of mutation.
+  // IFreezeMutateCtor - constructor interface 
+  // the object is 'new'ed on mutation to create the un-frozen empty object that is 
+  // then returen from the mutation. 
+  // the ctor enforces the change-set to be a valid subset of the existing properties.
+  
+  private static ctor: IFreezeMutateCtor<Todo> = Todo;
+  constructor(todo?: Partial<Todo>) {
+    if (todo && Todo.ctor) {
+      Object.keys(todo).forEach(key => {
+        const t = todo as any;
+        const me = this as any;
+        if (me[key] !== undefined) me[key] = t[key];
+      });
     }
+    // don't freeze in ctor! ctor is called as part of mutation.
+  }
 
-    // IfreezeMutate.freeze - interface
-    // the function is called during freeze()
-    // 'this' object and all object properties should be frozen in the function.
-    freeze(): void {
-        Object.freeze(this);
-        Object.freeze(this.created);
-    }
+  // IfreezeMutate.freeze - interface
+  // the function is called during freeze()
+  // 'this' object and all object properties should be frozen in the function.
+  freeze(): void {
+    Object.freeze(this);
+    Object.freeze(this.created);
+  }
 
-    // IfreezeMutate.merge - interface 
-    // the function is called 2-3 times during mutate() to construct the returned object.
-    merge(todo: Partial<Todo>): Readonly<Todo> {
+  // IfreezeMutate.merge - interface 
+  // the function is called 2-3 times during mutate() to construct the returned object.
+  merge(todo: Partial<Todo>): Readonly<Todo> {
 
-        const todo2 = new Todo({
-            id: (todo.id !== undefined) ? todo.id : this.id,
-            created: (todo.created !== undefined) ? new Date(todo.created.valueOf()) : this.created,
-            done: (todo.done !== undefined) ? todo.done : this.done
-        });
+    const todo2 = new Todo({
+      id: (todo.id !== undefined) ? todo.id : this.id,
+      created: (todo.created !== undefined) ? new Date(todo.created.valueOf()) : this.created,
+      done: (todo.done !== undefined) ? todo.done : this.done
+    });
 
-        // don't freeze in merge!
-        return todo2;
-    }
+    // don't freeze in merge!
+    return todo2;
+  }
 
-    // just a function overload to see it's working too
-    toString(): string {
-        return `${this.id}: ${this.done ? "done" : "todo"}`;
-    }
+  // just a function overload to see it's working too
+  toString(): string {
+    return `${this.id}: ${this.done ? "done" : "todo"}`;
+  }
 }
 
 // note that you absolutely don't _have to_ extened and implement these interfaces. 
@@ -186,13 +188,49 @@ assert( todo2 instanceof Todo );
 assert( todo2.created instanceof Date );
 assert( Object.isFrozen(todo2) );
 try { 
-    todo2.created = new Date("2000-01-01T00:00Z"); 
+  todo2.created = new Date("2000-01-01T00:00Z"); 
 } catch(e) {
-    // todo2 is immutable too!
+  // todo2 is immutable too!
 }
 
 assert( todo2.toString() === "2: done" );
+
 ```
+
+## produce function: make change thru a callback 
+(similar to immer/produce)
+
+```typescript
+
+import { produce } from "freeze-mutate";
+
+const baseState = [
+  {
+    todo: "Learn typescript",
+    done: true,
+  },
+  {
+    todo: "Try immer",
+    done: false,
+  },
+];
+
+const nextState = produce(baseState, draftState => {
+  draftState.push({ todo: "Tweet about it", done: false });
+  draftState[1].done = true;
+});
+
+// the new item is only added to the next state,
+// base state is unmodified
+expect(baseState.length).toBe(2);
+expect(nextState.length).toBe(3);
+
+// same for the changed 'done' prop
+expect(baseState[1].done).toBe(false);
+expect(nextState[1].done).toBe(true);
+
+```
+
 ## More features:
 1. Zero dependencies and just 2 KB pkg.
 1. Can be loaded in a browser.

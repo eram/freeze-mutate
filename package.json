@@ -6,7 +6,11 @@
     "immutable",
     "mutate",
     "freeze",
+    "deepCopy", 
+    "deepFreeze",
     "pojo",
+    "produce",
+    "immer/produce",
     "DTO",
     "javascript",
     "typescript"
